@@ -1,2 +1,2 @@
-# aws-de-cicd-Aribnb
+# aws-de-cicd-Airbnb
 Git repository for AirBnb project
