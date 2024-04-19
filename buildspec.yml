@@ -1,0 +1,25 @@
+version: 0.2
+phases:
+  install:
+    runtime_versions:
+      python: 3.11
+    commands:
+      - echo "No dependencies to install........................."
+  build:
+    commands:
+      - echo "Zipping deployment packages......"
+      - zip -g deployment_pkg_producebookingdata.zip ProduceAirbnbBookingDataLambda.py
+      - zip -g deployment_pkg_airbnbtos3.zip AirBnb-to-S3.py
+      - echo "Packages zipped.."
+  post_build:
+    commands:
+      - echo "Moving files to s3 bucket......."
+      - aws s3 cp deployment_pkg_producebookingdata.zip s3://aws-de-1-airbnb-booking-records/code_build/
+      - aws s3 cp deployment_pkg_airbnbtos3.zip s3://aws-de-1-airbnb-booking-records/code_build/
+      - echo "Files copied to s3..........."
+      - echo "Staring the function update......."
+      - aws lambda update-function-code --function-name ProduceAirbnbBookingData --s3-bucket aws-de-1-airbnb-booking-records --s3-key /code_build/deployment_pkg_producebookingdata.zip
+      - echo "ProduceAirbnbBookingData lambda function updated...."
+      - aws lambda update-function-code --function-name AirBnb-Enrichment --s3-bucket aws-de-1-airbnb-booking-records --s3-key /code_build/deployment_pkg_airbnbtos3.zip
+      - echo "AirBnb-Enrichment lambda function updated...."
+      - echo "*.*.*.*.*.*.*.*.*.*.*.*.*.Deployment completed *.*.*.*.*.*.*.*.*.*.*.*.*.*.*
